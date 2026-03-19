@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ShipmentConsumer } from './kafka/shipment.consumer';
+import { ShipmentStatusModule } from './shipment-status/shipment-status.module';
 
 @Module({
-  imports: [],
+  imports: [ShipmentStatusModule],
   controllers: [],
-  providers: [ShipmentConsumer],
+  providers: [],
 })
 export class AppModule {}
