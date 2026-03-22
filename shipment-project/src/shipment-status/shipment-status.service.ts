@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import * as sql from 'mssql';
 @Injectable()
@@ -31,7 +31,7 @@ export class ShipmentStatusService implements OnModuleInit {
             output inserted.id, inserted.status, inserted.event_time
             values (@orderId, @status, getdate())`)
       const newRow = insertRequest.recordset[0]
-      
+
       if (newRow.status.toLowerCase() == 'shipped') {
         this.sendShippedNotification(orderId)
       }
@@ -50,5 +50,17 @@ export class ShipmentStatusService implements OnModuleInit {
     }
     await this.kafkaClient.emit('user-notification', JSON.stringify(message))
     console.log(`send to user-notification: ${JSON.stringify(message)} `)
+  }
+
+  async getTimeline(orderId) {
+    const result = await this.pool.request()
+      .input('orderId', sql.Int, orderId)
+      .query(`select * from shipment_status where order_id=@orderId`)
+  
+      if (result.recordset.length === 0) {
+      throw new NotFoundException(`order with ID ${orderId} not found`)
+    }
+
+    return result.recordset
   }
 }
