@@ -1,7 +1,7 @@
-import { Controller, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
 import { EventPattern, Payload } from "@nestjs/microservices";
-import { ShipmentStatusService } from "../shipment-status.service";
 import { CreateShipmentStatusDto } from "../dto/create-shipment-status.dto";
+import { ShipmentStatusService } from "../shipment-status.service";
 
 @Controller()
 export class ShipmentStatusConsumer {

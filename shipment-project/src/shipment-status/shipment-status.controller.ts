@@ -1,6 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ShipmentStatusService } from './shipment-status.service';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('shipment-status')
 export class ShipmentStatusController {
@@ -11,5 +10,9 @@ export class ShipmentStatusController {
     return await this.shipmentStatusService.getTimeline(orderId)
   }
 
+  @Get('getCurrentStatus/:orderId')
+  async getCurrentStatus(@Param('orderId') orderId: number){
+    return await this.shipmentStatusService.getCurrentStatus(orderId)
+  }
 
 }

@@ -45,7 +45,7 @@ export class ShipmentStatusService implements OnModuleInit {
   async sendShippedNotification(orderId: number) {
     const message = {
       orderId: orderId,
-      message: `Your order #${orderId} has been shipped!`,
+      message: `Your order #${orderId} has been shipped`,
       time: new Date()
     }
     await this.kafkaClient.emit('user-notification', JSON.stringify(message))
@@ -56,11 +56,23 @@ export class ShipmentStatusService implements OnModuleInit {
     const result = await this.pool.request()
       .input('orderId', sql.Int, orderId)
       .query(`select * from shipment_status where order_id=@orderId`)
-  
-      if (result.recordset.length === 0) {
+
+    if (result.recordset.length === 0) {
       throw new NotFoundException(`order with ID ${orderId} not found`)
     }
 
     return result.recordset
+  }
+
+  async getCurrentStatus(orderId: number) {
+    const result = await this.pool.request()
+      .input('orderId', sql.Int, orderId)
+      .query(`select top 1 * from shipment_status 
+              where order_id=@orderId
+              order by event_time desc`)
+    if (result.recordset.length === 0) {
+      throw new NotFoundException(`order with ID ${orderId} not found`)
+    }
+    return result.recordset[0]
   }
 }
