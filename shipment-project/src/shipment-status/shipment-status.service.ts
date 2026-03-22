@@ -31,7 +31,10 @@ export class ShipmentStatusService implements OnModuleInit {
             output inserted.id, inserted.status, inserted.event_time
             values (@orderId, @status, getdate())`)
       const newRow = insertRequest.recordset[0]
-
+      
+      if (newRow.status.toLowerCase() == 'shipped') {
+        this.sendShippedNotification(orderId)
+      }
 
       return newRow
     } catch (err) {
@@ -39,5 +42,13 @@ export class ShipmentStatusService implements OnModuleInit {
     }
   }
 
-
+  async sendShippedNotification(orderId: number) {
+    const message = {
+      orderId: orderId,
+      message: `Your order #${orderId} has been shipped!`,
+      time: new Date()
+    }
+    await this.kafkaClient.emit('user-notification', JSON.stringify(message))
+    console.log(`send to user-notification: ${JSON.stringify(message)} `)
+  }
 }
