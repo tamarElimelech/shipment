@@ -1,12 +1,25 @@
 import { Module } from '@nestjs/common';
-import { ShipmentStatusService } from './shipment-status.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ShipmentStatusConsumer } from './kafka/shipment.consumer';
 import { ShipmentStatusController } from './shipment-status.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ShipmentStatus } from './entities/shipment-status.entity';
+import { ShipmentStatusService } from './shipment-status.service';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([ShipmentStatus])],
-  controllers: [ShipmentStatusController],
+  imports: [ClientsModule.register([
+    {
+      name: 'notification-client',
+      transport: Transport.KAFKA,
+      options: {
+        client: {
+          clientId: 'notifications-producer',
+          brokers: ['localhost:9092'],
+        }
+      },
+    }
+  ])],
+  controllers: [
+    ShipmentStatusController,
+    ShipmentStatusConsumer],
   providers: [ShipmentStatusService],
 })
-export class ShipmentStatusModule {}
+export class ShipmentStatusModule { }
