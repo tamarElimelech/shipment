@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ShipmentConsumer } from './kafka/shipment.consumer';
+import { ConfigModule } from '@nestjs/config';
+import { DBModule } from './DB/db.module';
+import { ShipmentStatusModule } from './shipment-status/shipment-status.module';
 
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    DBModule,
+    ShipmentStatusModule],
   controllers: [],
-  providers: [ShipmentConsumer],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule { }
