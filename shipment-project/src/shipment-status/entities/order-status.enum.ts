@@ -1,6 +1,6 @@
 export enum orderStatus {
-    Created,
-    Packed,
-    Shipped,
-    Delivered
+    Created = 'Created',
+    Packed = 'Packed',
+    Shipped = 'Shipped',
+    Delivered = 'Delivered'
 }
