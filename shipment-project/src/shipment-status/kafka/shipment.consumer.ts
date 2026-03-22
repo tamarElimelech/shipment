@@ -1,6 +1,7 @@
-import { Controller } from "@nestjs/common";
+import { Controller, UsePipes, ValidationPipe } from "@nestjs/common";
 import { EventPattern, Payload } from "@nestjs/microservices";
 import { ShipmentStatusService } from "../shipment-status.service";
+import { CreateShipmentStatusDto } from "../dto/create-shipment-status.dto";
 
 @Controller()
 export class ShipmentStatusConsumer {
@@ -8,8 +9,13 @@ export class ShipmentStatusConsumer {
     constructor(private readonly shipmentService: ShipmentStatusService) { }
 
     @EventPattern('shipment-status')
-    async handleShipmentStatus(@Payload() message: any) {
-        const { orderId, status } = message
-        await this.shipmentService.handleNewStatus(orderId, status)
+    async handleShipmentStatus(@Payload() data: CreateShipmentStatusDto) {
+        try {
+            return await this.shipmentService.handleNewStatus(data.orderId, data.status)
+        }
+        catch (err) {
+            console.error(`[ShipmentStatusConsumer] not valid message: ${err.message} ${err}`)
+        }
     }
+
 }
